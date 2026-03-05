@@ -1,13 +1,21 @@
 {
-	"name": "msi-generator",
+	"name": "msi-installer-generator",
 	"description": "Cross-platform MSI and MSIX package generator in pure D.",
-	"authors": ["The Dev Center"],
+	"authors": [
+		"The Dev Center"
+	],
 	"license": "MIT",
 	"targetType": "executable",
 	"dependencies": {
-		"cfb-d": {"path": "./libs/cfb-d"},
-		"cab-d": {"path": "./libs/cab-d"},
-		"msidb-d": {"path": "./libs/msidb-d"},
+		"cfb-d": {
+			"path": "./libs/cfb-d"
+		},
+		"cab-d": {
+			"path": "./libs/cab-d"
+		},
+		"msidb-d": {
+			"path": "./libs/msidb-d"
+		},
 		"asdf": "~>0.7.17"
 	},
 	"configurations": [
@@ -19,12 +27,16 @@
 		{
 			"name": "library",
 			"targetType": "library",
-			"excludedSourceFiles": ["source/app.d"]
+			"excludedSourceFiles": [
+				"source/app.d"
+			]
 		},
 		{
 			"name": "prod",
 			"targetType": "executable",
-			"versions": ["UseStringUUIDs"],
+			"versions": [
+				"UseStringUUIDs"
+			],
 			"mainSourceFile": "source/app.d"
 		}
 	]

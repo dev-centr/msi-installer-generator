@@ -1,5 +1,7 @@
 site:
   title: MSI/MSIX Generator
+output:
+  dir: ./public
 content:
   sources:
     - url: .

@@ -7,7 +7,13 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write # To deploy to GitHub Pages
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
 
 jobs:
   build-docs:
@@ -15,24 +21,47 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Fetch all history for Antora to see branches
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          package_json_file: package.json
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
 
-      - name: Install Antora
-        run: npm install -g @antora/cli @antora/site-generator
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
-      - name: Build Site
-        # By default antora-playbook points to HEAD for local builds,
-        # but in CI we want to use the current checkout.
-        # We'll use a modified playbook or override the url to '.'
-        run: antora antora-playbook.yml --to-dir public
-
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Build site
+        id: antora
+        uses: antora-supplemental/antora-build-action@v1
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./public
+          playbook: antora-playbook.yml
+          output_dir: public
+          skip_install: true
+          fetch: true
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: ${{ steps.antora.outputs.site-path }}
+
+  deploy:
+    needs: build-docs
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deploy
+        uses: actions/deploy-pages@v4

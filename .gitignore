@@ -1,9 +1,1 @@
-.dub/
-*.exe
-*.obj
-*.lst
-*.o
-*.lib
-*.a
-msi-generator
-
+node_modules/
